@@ -48,12 +48,22 @@ h1, h2, h3, h4, h5, h6 {
 body {
   --icon-background: #f4f1e8;
   --icon-foreground: #1a1a1a;
+  --link-foreground: #5b9bd5;
+  
+  background-image: url("img/background.png");
+  background-attachment: scroll;
+  background-repeat: repeat; 
+  background-size: 600px; 
+  background-position: center; 
+  
+  user-select: none;
 }
 
 @media (prefers-color-scheme: dark) {
   body {
     --icon-background: #1a1a1a;
     --icon-foreground: #f4f1e8;
+    --link-foreground: #5b9bd5;
   }
 }
 
@@ -62,6 +72,13 @@ html {
   background-color: var(--icon-background);
   color: var(--icon-foreground);
   height: 100%;
+  
+  font-family: "Noto Sans", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+  font-variation-settings:
+    "wdth" 100;
 }
 
 #logo-holder {
@@ -70,15 +87,6 @@ html {
   justify-content: center;
   height: 100%;
   padding: 2rem 2rem;
-}
-
-#under-construction {
-  font-family: "Oxanium", sans-serif;
-  font-optical-sizing: auto;
-  font-weight: 400;
-  font-style: normal;
-  font-size: 2.5rem;
-  margin-left: 2rem;
 }
 
 footer {
@@ -91,20 +99,32 @@ footer {
   align-items: center;
   padding: 2rem 2rem;
   
-  font-family: "Oxanium", sans-serif;
-  font-optical-sizing: auto;
-  font-weight: 600;
-  font-style: normal;
-  
   max-width: 1200px;
   margin: 0 auto;
   left: 50%;
   transform: translateX(-50%);
 }
 
-footer a {
-  color: #5B9BD5;
+a {
+  color: var(--link-foreground);
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+  padding: 0.2rem 0.4rem;
+  margin: -0.2rem -0.4rem;
+  border-radius: 5px;
 }
+
+a:hover {
+     color: var(--icon-background);
+     background-color: var(--link-foreground);
+ }
+
+a:focus {
+     color: var(--icon-background);
+     background-color: var(--link-foreground);
+     outline: none;
+ }
 
 footer p {
   margin: 0.25rem 0;
