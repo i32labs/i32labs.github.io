@@ -45,9 +45,22 @@ h1, h2, h3, h4, h5, h6 {
   isolation: isolate;
 }
 
+body {
+  --icon-background: #f4f1e8;
+  --icon-foreground: #1a1a1a;
+}
+
+@media (prefers-color-scheme: dark) {
+  body {
+    --icon-background: #1a1a1a;
+    --icon-foreground: #f4f1e8;
+  }
+}
+
 body,
 html {
-  background-color: #f4f1e8;
+  background-color: var(--icon-background);
+  color: var(--icon-foreground);
   height: 100%;
 }
 
@@ -90,7 +103,7 @@ footer {
 }
 
 footer a {
-  color: #789AB7;
+  color: #5B9BD5;
 }
 
 footer p {
