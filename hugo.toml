@@ -4,9 +4,14 @@ title = 'i32 Labs'
 
 [menus]
   [[menus.main]]
-    name = 'Posts'
-    pageRef = '/posts'
+    name = 'Nebula'
+    pageRef = '/nebula'
     weight = 10
+
+  [[menus.main]]
+    name = 'Press Kit'
+    pageRef = '/press'
+    weight = 20
 
 [module]
   [module.hugoVersion]

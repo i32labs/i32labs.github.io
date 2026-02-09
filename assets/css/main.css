@@ -6,6 +6,16 @@
   margin: 0;
 }
 
+html {
+  scrollbar-gutter: stable;
+  scroll-behavior: smooth;
+}
+
+::selection {
+  background-color: var(--link-foreground);
+  color: var(--icon-background);
+}
+
 @media (prefers-reduced-motion: no-preference) {
   html {
     interpolate-size: allow-keywords;
@@ -27,7 +37,7 @@ body {
   background-attachment: scroll;
   background-repeat: repeat; 
   background-size: 600px; 
-  background-position: top left; 
+  background-position: top center; 
   
   font-family: "Noto Sans", sans-serif;
   font-optical-sizing: auto;
@@ -35,6 +45,10 @@ body {
   font-style: normal;
   font-variation-settings:
     "wdth" 100;
+  
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -50,6 +64,73 @@ img, picture, video, canvas, svg {
   max-width: 100%;
 }
 
+main img {
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 
+              0 2px 4px -1px rgba(0, 0, 0, 0.06),
+              0 0 0 1px color-mix(in srgb, var(--icon-foreground) 10%, transparent);
+}
+
+table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  margin: 2rem 0;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 
+              0 2px 4px -1px rgba(0, 0, 0, 0.06),
+              0 0 0 1px color-mix(in srgb, var(--icon-foreground) 10%, transparent);
+}
+
+th, td {
+  padding: 1rem 1.5rem;
+  text-align: left;
+}
+
+th {
+  background-color: var(--icon-background);
+  font-weight: 700;
+  border-bottom: 2px solid color-mix(in srgb, var(--icon-foreground) 20%, transparent);
+}
+
+td {
+  border-bottom: 1px solid color-mix(in srgb, var(--icon-foreground) 10%, transparent);
+}
+
+tr:last-child td {
+  border-bottom: none;
+}
+
+tbody tr {
+  background-color: var(--icon-background);
+}
+
+
+table img {
+  margin: 0 auto;
+}
+
+section {
+  margin: 2rem 0;
+  padding: 1.25rem 1.5rem;
+  border-radius: 0.75rem;
+  background-color: color-mix(in srgb, var(--icon-background) 50%, transparent);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 
+              0 2px 4px -1px rgba(0, 0, 0, 0.06),
+              0 0 0 1px color-mix(in srgb, var(--icon-foreground) 10%, transparent);
+}
+
+section:hover {
+  background-color: color-mix(in srgb, var(--icon-background) 60%, transparent);
+}
+
+section h2:first-child {
+  margin-top: 0;
+}
+
 input, button, textarea, select {
   font: inherit;
 }
@@ -60,14 +141,126 @@ p, h1, h2, h3, h4, h5, h6 {
 
 p {
   text-wrap: pretty;
+  font-size: 1.125rem;
+  line-height: 1.75;
+  margin-bottom: 1.5rem;
+}
+
+ul, ol {
+  font-size: 1.125rem;
+  line-height: 1.75;
+  margin-bottom: 1.5rem;
+  padding-left: 2rem;
+}
+
+code {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.9em;
+  padding: 0.2em 0.4em;
+  background-color: color-mix(in srgb, var(--icon-foreground) 10%, transparent);
+  border-radius: 0.25rem;
+  border: 1px solid color-mix(in srgb, var(--icon-foreground) 15%, transparent);
+}
+
+pre {
+  margin: 2rem 0;
+  padding: 1.5rem;
+  border-radius: 0.75rem;
+  background-color: color-mix(in srgb, var(--icon-foreground) 8%, transparent);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 
+              0 2px 4px -1px rgba(0, 0, 0, 0.06),
+              0 0 0 1px color-mix(in srgb, var(--icon-foreground) 10%, transparent);
+  overflow-x: auto;
+}
+
+pre code {
+  font-size: 0.875rem;
+  padding: 0;
+  background-color: transparent;
+  border: none;
+}
+
+blockquote {
+  margin: 2rem 0;
+  padding: 1.25rem 1.5rem;
+  border-left: 4px solid var(--link-foreground);
+  background-color: color-mix(in srgb, var(--icon-foreground) 5%, transparent);
+  border-radius: 0 0.5rem 0.5rem 0;
+  font-style: italic;
+}
+
+blockquote p:last-child {
+  margin-bottom: 0;
+}
+
+hr {
+  margin: 3rem 0;
+  border: none;
+  height: 2px;
+  background: linear-gradient(to right, 
+    transparent, 
+    color-mix(in srgb, var(--icon-foreground) 30%, transparent) 50%, 
+    transparent);
 }
 
 h1, h2, h3, h4, h5, h6 {
   text-wrap: balance;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+h1 {
+  font-size: 2.5rem;
+  margin-top: 0;
+  margin-bottom: 2rem;
+}
+
+h2 {
+  font-size: 2rem;
+  margin-top: 3rem;
+  margin-bottom: 1.5rem;
+}
+
+h3 {
+  font-size: 1.5rem;
+  margin-top: 2.5rem;
+  margin-bottom: 1.25rem;
+}
+
+h4 {
+  font-size: 1.25rem;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+}
+
+h5 {
+  font-size: 1.125rem;
+  margin-top: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+h6 {
+  font-size: 1rem;
+  margin-top: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+main > h1:first-child,
+section > h1:first-child,
+article > h1:first-child {
+  margin-top: 0;
 }
 
 #root, #__next {
   isolation: isolate;
+}
+
+main {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+  width: 100%;
+  flex: 1;
 }
 
 #logo-holder {
@@ -80,19 +273,13 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 footer {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 2rem 2rem;
-  
+  padding: 2rem;
+  width: 100%;
   max-width: 1200px;
   margin: 0 auto;
-  left: 50%;
-  transform: translateX(-50%);
 }
 
 a:not(.no-a-effect) {
@@ -118,4 +305,72 @@ a:not(.no-a-effect):focus {
 
 footer p {
   margin: 0.25rem 0;
+}
+
+.not-found {
+    position: absolute;
+    left: 0;
+    right: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 80%;
+    font-size: 160px;
+    font-weight: 700;
+}
+
+header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1.5rem 2rem;
+  gap: 1rem;
+}
+
+@media (min-width: 768px) {
+  header {
+    position: fixed;
+    top: 1.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    width: calc(100% - 3rem);
+    max-width: 1200px;
+    z-index: 1000;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 1.5rem 2rem;
+    background-color: color-mix(in srgb, var(--icon-background) 85%, transparent);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 1rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 
+                0 2px 4px -1px rgba(0, 0, 0, 0.06),
+                0 0 0 1px color-mix(in srgb, var(--icon-foreground) 10%, transparent);
+  }
+  
+  body {
+    padding-top: 140px;
+  }
+}
+
+header nav ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+@media (min-width: 768px) {
+  header nav ul {
+    justify-content: flex-end;
+    gap: 2rem;
+    font-size: 1.125rem;
+  }
+}
+
+header nav ul li {
+  margin: 0;
 }
