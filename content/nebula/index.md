@@ -209,3 +209,191 @@ void main(uint3 dispatchThreadID : SV_DispatchThreadID)
     constant.indirectCountBufferIndex.view<RWBuffer<uint>>()[0] = 1;
 }
 ```
+
+## Assets
+
+### Classes & Types
+
+#### Assets<T
+
+The assets storage is a generic collection that contains all assets for a specifid asset type `T`.
+Assets are ref counted and accessed via a `Handle{T}`. We also support the concept of a default asset for
+cases where an asset cannot be found, is still loading or is invalid.
+
+Assets can be added, removed and queried from the storage. Although if loading from disk, assets should be loaded
+via the `AssetLoader`
+
+#### Handle<T
+
+A lightweight reference to an asset stored in `Assets{T}`. Instead of directly accessing and storing assets
+we use handles. Handles also allow us to dynamically replace the asset backing the handle (such as hot-reading).
+
+#### AssetLoader
+
+The asset loader is responsible for loading assets from disk. If provided with the same uri+type it will
+return the same `Handle{T}` ensuring resources are only loaded once.
+
+Internally the asset loader will add the asset to an appropriate asset storage via `Assets{T}`.
+
+#### AssetProvider<T
+
+The asset provider is registered for each support asset type `T`. It is responsible for the actual loading of the asset`.
+
+When providing a custom asset you will need to implement an asset provider for your type.
+
+
+### Default Supported Assets
+
+These assets are supported out of the box:
+
+- Font
+- Texture
+- Audio
+
+Generally speaking you'll have to add support for your own asset types such as Meshes, Materials, Shaders etc.
+
+### Asset Storage
+
+- Assets/
+
+
+### Hot Reloading
+
+AssetLoader will check the last modified time of the file on disk and if it has changed, it will reload the asset. While debugging
+Nebula will load assets from within the project directory, otherwise it will load from the bin directory.
+
+### TODO:
+
+- Asset Dependencies (e.g., Material -> Shader, Texture)
+
+
+## Scene Format & Prefabs
+
+This section describes the in development scene format (and prefab format)
+
+### Prefab
+
+```json
+{
+  "version": 1,
+  "prefab": {
+    "name": "PlayerWithGun",
+    "entities": [
+      {
+        "EntityName": "Player",
+        // GlobalTransform is added via "required components"
+        "Transform3D": {
+          "Translation": [0, 1, 0],
+          "Rotation": [0, 0, 0, 1],
+          "Scale": [1, 1, 1]
+        },
+        // ViewVisibility and InheritedVisibility are added via "required components"
+        "Visibility": "Inherited",
+        // GpuInstanceData, GpuInstanceDirty, GpuInstanceId are added via "required components"
+        "Renderable": {  
+            // Link up assets / resources
+            "Mesh": "$meshes.capsule",
+            "Material": "$materials.player"
+        }
+      },
+      {
+        "EntityName": "PlayerGun",
+        "Transform3D": {
+          "Translation": [0.9, 0, 0.2],
+          "Rotation": [0, 0.707, 0, 0.707],
+          "Scale": [0.01, 0.01, 0.01]
+        },
+        "Visibility": "Inherited",
+        "Renderable": {  
+            "Mesh": "$meshes.m1911",
+            "Material": "$materials.gun"
+        },
+        "ChildOf": { "parent": "@Player" }
+      }
+    ]
+  },
+  // All resources or 'assets' are defined here, the asset group name is registered in the engine
+  "resources": {
+    // Mesh
+    "meshes": {
+      // This mesh is defined inline, it'll be created dynamically based on the properties
+      "capsule": { 
+        "type": "inline", 
+        // Properties is a custom object defined for each inline asset
+        "properties": { 
+          // A simple example, set the shape, but we could also pass extra params in here like size
+          "shape": "capsule"
+        } 
+      },
+      
+      // Resources can be loaded directly from a file using the resource loader
+      // We may also specify custom options
+      "m1911": { "type": "file", "path": "Assets/M1911.obj", "options": {} }
+    },
+    // StandardMaterial
+    "materials": {
+      // Resources can be defined inline without loading from a file
+      "gun": { 
+        "type": "inline", 
+        // These properties are specific to the material
+        "properties": { 
+          "color": [1, 0, 0, 0] 
+        } 
+      }
+    }
+  }
+}
+
+```
+
+### Scene
+
+```json
+{
+  "version": 1,
+  "scene": {
+    "entities": [
+      {
+        "EntityName": "Player",
+        // GlobalTransform is added via "required components"
+        "Transform3D": {
+          "Translation": [0, 1, 0],
+          "Rotation": [0, 0, 0, 1],
+          "Scale": [1, 1, 1]
+        },
+        // ViewVisibility and InheritedVisibility are added via "required components"
+        "Visibility": "Inherited",
+        // GpuInstanceData, GpuInstanceDirty, GpuInstanceId are added via "required components"
+        "Renderable": {  
+            "Mesh": "$meshes.capsule",
+            "Material": "$materials.player"
+        }
+      },
+      {
+        "EntityName": "PlayerGun",
+        "Transform3D": {
+          "Translation": [0.9, 0, 0.2],
+          "Rotation": [0, 0.707, 0, 0.707],
+          "Scale": [0.01, 0.01, 0.01]
+        },
+        "Visibility": "Inherited",
+        "Renderable": {  
+            "Mesh": "$meshes.m1911",
+            "Material": "$materials.gun"
+        },
+        "ChildOf": { "parent": "@Player" }
+      }
+    ]
+  },
+  "resources": {
+    "meshes": {
+      "capsule": { "type": "procedural", "shape": "capsule" },
+      "m1911": { "type": "file", "path": "Assets/M1911.obj" }
+    },
+    "materials": { 
+        "gun": {  "type": "inline",  "properties": { "color": [1, 0, 0, 0] } } 
+    }
+  }
+}
+
+```
