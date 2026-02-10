@@ -37,6 +37,21 @@ Windows 10, 1909 is required (or Windows Server 2022). Please pay attention to t
 | Windows 10 | 2004 | 789 |
 | Windows 10 | 20H2 | 789 |
 
+## Technical Limits
+
+The below table describes the technical limits of Nebula, you will most likely encounter GPU / CPU bottlenecks before you reach these limits.
+
+| Area | Limit | Notes |
+|---|---|---|
+| Meshes | 16,384 | |
+| Mesh LODs | 65,536 | |
+| Vertices | 128 MB | |
+| Indices | 128 MB | |
+| Instances | 65,536 | |
+| Skinned Instances | 4096 | |
+| Materials | 65,536 | |
+| Unique Pipelines | 128 | |
+
 ## Useful Resources
 
 - https://asawicki.info/articles/state_of_gpu_hardware_2025.php
@@ -397,3 +412,51 @@ This section describes the in development scene format (and prefab format)
 }
 
 ```
+
+## Global Buffers
+
+These core buffers are used throughout Nebula. A subset of these are passed to the graphics shader via a root constant.
+
+### Meshes
+
+Provides information necessary for the global vertices buffer to render a mesh (`VertexStride`, and `VertexByteOffset`). Also contains bounding information for compute based culling (`BoundingSphereCenter` and `BoundingSphereRadius`).
+
+Points towards one or more mesh lods for actual index data  for rendering the mesh as various levels of detail (via `LodCount` and `LodBaseIndex`).
+
+### MeshLODs
+
+Provides information necessary for interpretation of the global index buffer (`IndexElementOffset` and `IndexElementCount`).
+
+Also contains `ScreenSizeThreshold` used to determine when the LOD should be active.
+
+### Vertices
+
+Global byte buffer containing all vertices of varying strides. 
+
+### Indices
+
+Global `uint` buffer containing all indices.
+
+### Instances
+
+Every instance in the scene will have an item in this buffer. This determines where a mesh should be rendered alongside the material, optional skinning transforms, flags and the render pipeline.
+
+The render pipeline can override the pbr material if needed (in that case, just set it to 0).
+
+### Visible Instances
+
+Used for compute based gpu culling.
+
+### Materials
+
+PBR based material properties. 
+
+### Bone Matrices
+
+Bone transforms for skinning.
+
+### Indirect Arguments
+
+### Indirect Count
+
+### DrawIds
