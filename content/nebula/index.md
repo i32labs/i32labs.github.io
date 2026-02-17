@@ -59,36 +59,19 @@ The below table describes the technical limits of Nebula, you will most likely e
 
 ## Design Goals
 
-### Two Root Signatures
+Nebula is designed as a modern bindless gpu driven rendering engine. What does this mean?
 
-`Nebula.Gpu` was originally born as a simple D3D12 wrapper mimicking the wgpu api. As we move away from this system of "bind groups" to fully bindless, we are making a few changes. Namley, only two root signatures generated at startup used for all shaders. This follows a similar approach to Frostbite and Cyberpunk 2077.
+All scene resources are stored in persistent large buffers on the GPU. This includes things like meshes, lods, materials, instances etc. Resources interact and depend on each other via indices into the global buffers. Notably Nebula uses a global vertex and index buffers for all meshes (inspired by ID tech and other modern renderers). This allows the GPU to access all vertex data without the need of cpu side commands.
 
-#### Compute Root Signature
+Scenes are culled on the GPU using a compute shader, draw calls are setup in draw indirect buffers. The CPU does not issue individual draw calls, but instead grouped calls based on batched passes using MultiDrawIndirect. All render pass data is sent to the GPU via a root constant (indices pointing towards the srv descriptors of the buffers).
 
-#### Graphics Root Signature
-
-What would a graphics root signature hold? Usually this is data that is not bindless, like uniform / constant buffers (view, proj, pos, time etc.)
-
-### GPU Only Descriptor Heaps
-
-As we're a bindless engine, CPU only staging descriptor heaps are no used, resources are allocated directly to GPU visible heaps, and indexed within the shader.
-
-This does not apply to RTV and DSVs.
-
-It's important that we don't free these resources while the GPU is using them, otherwise we will encounter undefined behavior. It's also especially important that we don't mess up what type of index we point towards. This is done by reference counting usages.
-
-We may need to pair UAV and SRV descriptors together!
-
-### 100% GPU Driven
-
-Scenes are culled on the GPU using a compute shader, draw calls are setup in draw buffers.
-
-
-## Bindless
-
-> test
+We keep pipeline count low and keep root signatures even lower at only two root signatures which are generated at startup used for all shaders. This follows a similar approach to Frostbite and Cyberpunk 2077. By default we allocate 128 byte for a dynamic push / root constant, and provide CBV access to shaders that may need it (such as camera position data).
 
 ### Descriptor Heaps & Descriptor Handles
+
+CPU only staging descriptor heaps are no used, resources are allocated directly to GPU visible heaps, and indexed within the shader. This does not apply to RTV and DSVs.
+
+It's important that we don't free these resources while the GPU is using them, otherwise we will encounter undefined behavior. It's also especially important that we don't mess up what type of index we point towards. This is done by reference counting usages.
 
 Whenever a resource is created in Nebula (buffer, texture or sampler), one or more descriptors are assigned to the resource based on its usage. These descriptors are stored in a universal GPU visible descriptor heap - and are cleaned up when safe.
 
@@ -103,7 +86,6 @@ Depending on the value of `DescriptorType` will will retrieve the following:
 If the resource has not been setup with the appropriate usages, an exception will be thrown. An exception will also be thrown if attempting to access `ConstantBuffer` on textures.
 
 It's important to note that this index is only valid as long as the resource is alive, descriptor indices are reused as needed.
-
 
 Resources are accessed within GPU shaders via descriptor handles. Nebula provides two different types of descriptor handles depending on your goals.
 
@@ -243,16 +225,23 @@ via the `AssetLoader`
 A lightweight reference to an asset stored in `Assets{T}`. Instead of directly accessing and storing assets
 we use handles. Handles also allow us to dynamically replace the asset backing the handle (such as hot-reading).
 
-#### AssetLoader
+#### `AssetManager`
 
-The asset loader is responsible for loading assets from disk. If provided with the same uri+type it will
+The AssetManager is responsible for loading assets from disk. If provided with the same uri+type it will
 return the same `Handle{T}` ensuring resources are only loaded once.
 
 Internally the asset loader will add the asset to an appropriate asset storage via `Assets{T}`.
 
 #### AssetProvider<T
 
-The asset provider is registered for each support asset type `T`. It is responsible for the actual loading of the asset`.
+The asset provider is registered for each support asset type `T`. It is responsible for the actual loading of the asset.
+
+Assets providers are also responsible for "cooking" assets, that is turning them into `.nasset` files which nebula can load without any processing.
+
+For example: When loading a mesh, lots of work is done to process vertices, optimize, generate LODs etc. Doing this every time on startup is expensive, instead
+Nebula will process an asset if it does not exist (or is outdated) and store it next to your executable for next launch and distribution.
+
+Asset cooking is entirely optional and does not have to be implemented within an AssetProvider.
 
 When providing a custom asset you will need to implement an asset provider for your type.
 
